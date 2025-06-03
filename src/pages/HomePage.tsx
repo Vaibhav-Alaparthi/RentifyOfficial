@@ -1,0 +1,38 @@
+import React from 'react';
+import { items } from '../data/items';
+import ItemCard from '../components/ItemCard';
+import { Link } from 'react-router-dom';
+
+const HomePage: React.FC = () => {
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold mb-2">Rent Stuff From Your Neighbors</h1>
+        <p className="text-gray-600">Find sports equipment, tools, and more at friendly prices</p>
+      </div>
+
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Available Items</h2>
+          <Link to="/items" className="text-blue-500 hover:underline">View all</Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {items.map(item => (
+            <ItemCard key={item.id} item={item} />
+          ))}
+        </div>
+      </div>
+
+      <div className="text-center">
+        <Link 
+          to="/list-item"
+          className="inline-block bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+        >
+          List Your Item
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+export default HomePage;
