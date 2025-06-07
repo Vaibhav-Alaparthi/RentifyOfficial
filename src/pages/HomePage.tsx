@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const HomePage: React.FC = () => {
