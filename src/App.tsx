@@ -1,21 +1,29 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import HomePage from './pages/HomePage';
+import ListingsPage from './pages/ListingsPage';
+import CreateListingPage from './pages/CreateListingPage';
+import ListingDetailPage from './pages/ListingDetailPage';
+import AuthPage from './pages/AuthPage';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm">
-          <div className="max-w-4xl mx-auto px-4 py-4">
-            <Link to="/" className="text-xl font-bold">Rentify</Link>
-          </div>
-        </nav>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen bg-gray-50">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/listings" element={<ListingsPage />} />
+            <Route path="/listing/:id" element={<ListingDetailPage />} />
+            <Route path="/create-listing" element={<CreateListingPage />} />
+            <Route path="/auth" element={<AuthPage />} />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
