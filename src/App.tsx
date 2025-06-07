@@ -8,7 +8,7 @@ function App() {
       <div className="min-h-screen bg-gray-50">
         <nav className="bg-white shadow-sm">
           <div className="max-w-4xl mx-auto px-4 py-4">
-            <Link to="/" className="text-xl font-bold">RentStuff</Link>
+            <Link to="/" className="text-xl font-bold">Rentify</Link>
           </div>
         </nav>
         <Routes>
