@@ -22,7 +22,7 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center">
           <Link to="/" className="flex items-center space-x-2">
             <Home className="h-6 w-6 text-blue-600" />
-            <span className="text-xl font-bold text-gray-800">RentEase</span>
+            <span className="text-xl font-bold text-gray-800">Rentify</span>
           </Link>
           
           <div className="flex items-center space-x-4">
