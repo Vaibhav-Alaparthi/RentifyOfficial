@@ -11,6 +11,9 @@ interface Listing {
   price: number;
   price_unit: string;
   location: string;
+  city?: string;
+  state?: string;
+  country?: string;
   category: string;
   condition: string;
   images: string[];
