@@ -151,6 +151,54 @@ export class LocalStorageAuth {
     return newListing;
   }
 
+  static updateListing(id: string, updates: Partial<Omit<Listing, 'id' | 'created_at' | 'owner_id'>>): Listing | null {
+    const listings = this.getListings();
+    const listingIndex = listings.findIndex(listing => listing.id === id);
+    
+    if (listingIndex === -1) return null;
+    
+    listings[listingIndex] = {
+      ...listings[listingIndex],
+      ...updates
+    };
+    
+    this.saveListings(listings);
+    return listings[listingIndex];
+  }
+
+  static deleteListing(id: string): boolean {
+    const listings = this.getListings();
+    const listingIndex = listings.findIndex(listing => listing.id === id);
+    
+    if (listingIndex === -1) return false;
+    
+    // Remove the listing
+    listings.splice(listingIndex, 1);
+    this.saveListings(listings);
+    
+    // Clean up related data
+    this.deleteListingRelatedData(id);
+    
+    return true;
+  }
+
+  private static deleteListingRelatedData(listingId: string): void {
+    // Delete related rentals
+    const rentals = this.getRentals();
+    const filteredRentals = rentals.filter(rental => rental.listing_id !== listingId);
+    this.saveRentals(filteredRentals);
+    
+    // Delete related messages
+    const messages = this.getMessages();
+    const filteredMessages = messages.filter(message => message.listing_id !== listingId);
+    this.saveMessages(filteredMessages);
+    
+    // Delete related conversations
+    const conversations = this.getConversations();
+    const filteredConversations = conversations.filter(conv => conv.listing_id !== listingId);
+    this.saveConversations(filteredConversations);
+  }
+
   static getListingById(id: string): Listing | null {
     const listings = this.getListings();
     return listings.find(listing => listing.id === id) || null;

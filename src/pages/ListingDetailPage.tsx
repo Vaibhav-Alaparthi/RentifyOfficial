@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
-import { MapPin, Clock, ArrowLeft, MessageCircle, ImageOff } from 'lucide-react';
+import { useParams, Navigate, useNavigate } from 'react-router-dom';
+import { MapPin, Clock, ArrowLeft, MessageCircle, ImageOff, Edit, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
 import RentalModal from '../components/RentalModal';
 import ChatModal from '../components/ChatModal';
+import EditListingModal from '../components/EditListingModal';
 
 interface Listing {
   id: string;
@@ -24,11 +25,14 @@ interface Listing {
 const ListingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
   const [showRentalModal, setShowRentalModal] = useState(false);
   const [showChatModal, setShowChatModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -51,6 +55,24 @@ const ListingDetailPage: React.FC = () => {
     // Refresh or show success message
     alert('Rental request submitted successfully!');
   };
+
+  const handleListingUpdated = (updatedListing: Listing) => {
+    setListing(updatedListing);
+  };
+
+  const handleDeleteListing = () => {
+    if (!listing || !user || listing.owner_id !== user.id) return;
+
+    const success = LocalStorageAuth.deleteListing(listing.id);
+    if (success) {
+      alert('Listing deleted successfully!');
+      navigate('/listings');
+    } else {
+      alert('Error deleting listing. Please try again.');
+    }
+  };
+
+  const isOwner = user && listing && user.id === listing.owner_id;
 
   if (loading) {
     return (
@@ -124,9 +146,32 @@ const ListingDetailPage: React.FC = () => {
           {/* Details */}
           <div>
             <div className="mb-4">
-              <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full capitalize mb-2">
-                {listing.category}
-              </span>
+              <div className="flex justify-between items-start mb-2">
+                <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full capitalize">
+                  {listing.category}
+                </span>
+                
+                {/* Owner Actions */}
+                {isOwner && (
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setShowEditModal(true)}
+                      className="flex items-center space-x-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="flex items-center space-x-1 px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 text-sm"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+              
               <h1 className="text-3xl font-bold text-gray-800 mb-2">{listing.title}</h1>
               
               <div className="flex items-center text-gray-600 mb-4">
@@ -148,7 +193,8 @@ const ListingDetailPage: React.FC = () => {
               <p className="text-gray-600">{listing.description}</p>
             </div>
 
-            {user && user.id !== listing.owner_id && (
+            {/* Action Buttons for Non-Owners */}
+            {user && !isOwner && (
               <div className="space-y-3">
                 <button 
                   onClick={() => setShowChatModal(true)}
@@ -167,6 +213,16 @@ const ListingDetailPage: React.FC = () => {
               </div>
             )}
 
+            {/* Owner Message */}
+            {isOwner && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-blue-800">
+                  This is your listing. You can edit or delete it using the buttons above.
+                </p>
+              </div>
+            )}
+
+            {/* Sign In Message for Non-Users */}
             {!user && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p className="text-yellow-800">
@@ -195,6 +251,42 @@ const ListingDetailPage: React.FC = () => {
           isOpen={showChatModal}
           onClose={() => setShowChatModal(false)}
         />
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && (
+        <EditListingModal
+          listing={listing}
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onListingUpdated={handleListingUpdated}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-bold mb-4">Delete Listing</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this listing? This action cannot be undone and will also remove all related rental requests and messages.
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteListing}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
