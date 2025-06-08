@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
 import RentalModal from '../components/RentalModal';
+import ChatModal from '../components/ChatModal';
 
 interface Listing {
   id: string;
@@ -27,6 +28,7 @@ const ListingDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
   const [showRentalModal, setShowRentalModal] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -137,7 +139,10 @@ const ListingDetailPage: React.FC = () => {
 
             {user && user.id !== listing.owner_id && (
               <div className="space-y-3">
-                <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 flex items-center justify-center">
+                <button 
+                  onClick={() => setShowChatModal(true)}
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 flex items-center justify-center"
+                >
                   <MessageCircle className="h-5 w-5 mr-2" />
                   Contact Owner
                 </button>
@@ -169,6 +174,15 @@ const ListingDetailPage: React.FC = () => {
           isOpen={showRentalModal}
           onClose={() => setShowRentalModal(false)}
           onRentalCreated={handleRentalCreated}
+        />
+      )}
+
+      {/* Chat Modal */}
+      {showChatModal && (
+        <ChatModal
+          listing={listing}
+          isOpen={showChatModal}
+          onClose={() => setShowChatModal(false)}
         />
       )}
     </div>

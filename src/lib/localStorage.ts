@@ -31,11 +31,33 @@ interface Rental {
   updated_at: string;
 }
 
+interface Message {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  listing_id: string;
+  content: string;
+  created_at: string;
+  read: boolean;
+}
+
+interface Conversation {
+  id: string;
+  listing_id: string;
+  participant1_id: string;
+  participant2_id: string;
+  last_message: string;
+  last_message_at: string;
+  created_at: string;
+}
+
 export class LocalStorageAuth {
   private static USERS_KEY = 'rentease_users';
   private static CURRENT_USER_KEY = 'rentease_current_user';
   private static LISTINGS_KEY = 'rentease_listings';
   private static RENTALS_KEY = 'rentease_rentals';
+  private static MESSAGES_KEY = 'rentease_messages';
+  private static CONVERSATIONS_KEY = 'rentease_conversations';
 
   static getUsers(): User[] {
     const users = localStorage.getItem(this.USERS_KEY);
@@ -185,5 +207,106 @@ export class LocalStorageAuth {
   static getRentalById(id: string): Rental | null {
     const rentals = this.getRentals();
     return rentals.find(rental => rental.id === id) || null;
+  }
+
+  // Message methods
+  static getMessages(): Message[] {
+    const messages = localStorage.getItem(this.MESSAGES_KEY);
+    return messages ? JSON.parse(messages) : [];
+  }
+
+  static saveMessages(messages: Message[]): void {
+    localStorage.setItem(this.MESSAGES_KEY, JSON.stringify(messages));
+  }
+
+  static createMessage(message: Omit<Message, 'id' | 'created_at' | 'read'>): Message {
+    const messages = this.getMessages();
+    const newMessage: Message = {
+      ...message,
+      id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      read: false
+    };
+    
+    messages.push(newMessage);
+    this.saveMessages(messages);
+    
+    // Update or create conversation
+    this.updateConversation(message.sender_id, message.receiver_id, message.listing_id, message.content);
+    
+    return newMessage;
+  }
+
+  static getMessagesByConversation(userId1: string, userId2: string, listingId: string): Message[] {
+    const messages = this.getMessages();
+    return messages.filter(message => 
+      message.listing_id === listingId &&
+      ((message.sender_id === userId1 && message.receiver_id === userId2) ||
+       (message.sender_id === userId2 && message.receiver_id === userId1))
+    ).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  }
+
+  static markMessagesAsRead(userId: string, otherUserId: string, listingId: string): void {
+    const messages = this.getMessages();
+    const updatedMessages = messages.map(message => {
+      if (message.listing_id === listingId && 
+          message.sender_id === otherUserId && 
+          message.receiver_id === userId) {
+        return { ...message, read: true };
+      }
+      return message;
+    });
+    this.saveMessages(updatedMessages);
+  }
+
+  // Conversation methods
+  static getConversations(): Conversation[] {
+    const conversations = localStorage.getItem(this.CONVERSATIONS_KEY);
+    return conversations ? JSON.parse(conversations) : [];
+  }
+
+  static saveConversations(conversations: Conversation[]): void {
+    localStorage.setItem(this.CONVERSATIONS_KEY, JSON.stringify(conversations));
+  }
+
+  static updateConversation(userId1: string, userId2: string, listingId: string, lastMessage: string): void {
+    const conversations = this.getConversations();
+    const existingIndex = conversations.findIndex(conv => 
+      conv.listing_id === listingId &&
+      ((conv.participant1_id === userId1 && conv.participant2_id === userId2) ||
+       (conv.participant1_id === userId2 && conv.participant2_id === userId1))
+    );
+
+    const now = new Date().toISOString();
+
+    if (existingIndex >= 0) {
+      conversations[existingIndex].last_message = lastMessage;
+      conversations[existingIndex].last_message_at = now;
+    } else {
+      const newConversation: Conversation = {
+        id: crypto.randomUUID(),
+        listing_id: listingId,
+        participant1_id: userId1,
+        participant2_id: userId2,
+        last_message: lastMessage,
+        last_message_at: now,
+        created_at: now
+      };
+      conversations.push(newConversation);
+    }
+
+    this.saveConversations(conversations);
+  }
+
+  static getConversationsByUser(userId: string): Conversation[] {
+    const conversations = this.getConversations();
+    return conversations.filter(conv => 
+      conv.participant1_id === userId || conv.participant2_id === userId
+    ).sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime());
+  }
+
+  static getUserById(id: string): User | null {
+    const users = this.getUsers();
+    return users.find(user => user.id === id) || null;
   }
 }
