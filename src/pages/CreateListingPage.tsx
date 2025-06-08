@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, X } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
 
 const CreateListingPage: React.FC = () => {
@@ -50,27 +50,19 @@ const CreateListingPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('listings')
-        .insert([
-          {
-            title: formData.title,
-            description: formData.description,
-            price: parseFloat(formData.price),
-            price_unit: formData.price_unit,
-            location: formData.location,
-            category: formData.category,
-            condition: formData.condition,
-            images: formData.images.length > 0 ? formData.images : ['https://images.pexels.com/photos/3448250/pexels-photo-3448250.jpeg'],
-            owner_id: user.id
-          }
-        ])
-        .select()
-        .single();
+      const newListing = LocalStorageAuth.createListing({
+        title: formData.title,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        price_unit: formData.price_unit,
+        location: formData.location,
+        category: formData.category,
+        condition: formData.condition,
+        images: formData.images.length > 0 ? formData.images : ['https://images.pexels.com/photos/3448250/pexels-photo-3448250.jpeg'],
+        owner_id: user.id
+      });
 
-      if (error) throw error;
-
-      navigate(`/listing/${data.id}`);
+      navigate(`/listing/${newListing.id}`);
     } catch (error) {
       console.error('Error creating listing:', error);
       alert('Error creating listing. Please try again.');

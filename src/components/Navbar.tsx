@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Plus, User, LogOut } from 'lucide-react';
+import { Home, Plus, User, LogOut, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const Navbar: React.FC = () => {
@@ -35,6 +35,14 @@ const Navbar: React.FC = () => {
             
             {user ? (
               <>
+                <Link 
+                  to="/rentals" 
+                  className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 font-medium"
+                >
+                  <Calendar className="h-4 w-4" />
+                  <span>My Rentals</span>
+                </Link>
+                
                 <Link 
                   to="/create-listing" 
                   className="flex items-center space-x-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"

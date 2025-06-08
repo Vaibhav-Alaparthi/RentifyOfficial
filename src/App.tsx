@@ -6,6 +6,7 @@ import ListingsPage from './pages/ListingsPage';
 import CreateListingPage from './pages/CreateListingPage';
 import ListingDetailPage from './pages/ListingDetailPage';
 import AuthPage from './pages/AuthPage';
+import RentalsPage from './pages/RentalsPage';
 import Navbar from './components/Navbar';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/listing/:id" element={<ListingDetailPage />} />
             <Route path="/create-listing" element={<CreateListingPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/rentals" element={<RentalsPage />} />
           </Routes>
         </div>
       </Router>

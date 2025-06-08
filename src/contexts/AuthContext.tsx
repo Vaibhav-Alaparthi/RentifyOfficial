@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+import { LocalStorageAuth } from '../lib/localStorage';
+
+interface User {
+  id: string;
+  email: string;
+  createdAt: string;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -17,40 +22,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Listen for changes on auth state
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    // Check for existing user session
+    const currentUser = LocalStorageAuth.getCurrentUser();
+    setUser(currentUser);
+    setLoading(false);
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    if (error) throw error;
+    try {
+      const newUser = await LocalStorageAuth.signUp(email, password);
+      setUser(newUser);
+    } catch (error) {
+      throw error;
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
+    try {
+      const user = await LocalStorageAuth.signIn(email, password);
+      setUser(user);
+    } catch (error) {
+      throw error;
+    }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      await LocalStorageAuth.signOut();
+      setUser(null);
+    } catch (error) {
+      throw error;
+    }
   };
 
   return (

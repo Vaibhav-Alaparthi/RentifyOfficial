@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { LocalStorageAuth } from '../lib/localStorage';
 import ListingCard from '../components/ListingCard';
 
 interface Listing {
@@ -27,15 +27,10 @@ const ListingsPage: React.FC = () => {
     fetchListings();
   }, []);
 
-  const fetchListings = async () => {
+  const fetchListings = () => {
     try {
-      const { data, error } = await supabase
-        .from('listings')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setListings(data || []);
+      const allListings = LocalStorageAuth.getListings();
+      setListings(allListings);
     } catch (error) {
       console.error('Error fetching listings:', error);
     } finally {

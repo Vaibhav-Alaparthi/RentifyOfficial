@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { MapPin, Clock, ArrowLeft, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
+import RentalModal from '../components/RentalModal';
 
 interface Listing {
   id: string;
@@ -25,6 +26,7 @@ const ListingDetailPage: React.FC = () => {
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  const [showRentalModal, setShowRentalModal] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -32,21 +34,20 @@ const ListingDetailPage: React.FC = () => {
     }
   }, [id]);
 
-  const fetchListing = async () => {
+  const fetchListing = () => {
     try {
-      const { data, error } = await supabase
-        .from('listings')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      setListing(data);
+      const foundListing = LocalStorageAuth.getListingById(id!);
+      setListing(foundListing);
     } catch (error) {
       console.error('Error fetching listing:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRentalCreated = () => {
+    // Refresh or show success message
+    alert('Rental request submitted successfully!');
   };
 
   if (loading) {
@@ -141,7 +142,10 @@ const ListingDetailPage: React.FC = () => {
                   Contact Owner
                 </button>
                 
-                <button className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700">
+                <button 
+                  onClick={() => setShowRentalModal(true)}
+                  className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700"
+                >
                   Request to Rent
                 </button>
               </div>
@@ -157,6 +161,16 @@ const ListingDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Rental Modal */}
+      {showRentalModal && (
+        <RentalModal
+          listing={listing}
+          isOpen={showRentalModal}
+          onClose={() => setShowRentalModal(false)}
+          onRentalCreated={handleRentalCreated}
+        />
+      )}
     </div>
   );
 };
