@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle, Clock, User } from 'lucide-react';
+import { MessageCircle, Clock, User, ImageOff } from 'lucide-react';
 import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
 import ChatModal from '../components/ChatModal';
@@ -127,54 +127,67 @@ const MessagesPage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-2">
-            {conversations.map(conversation => (
-              <div
-                key={conversation.id}
-                onClick={() => handleConversationClick(conversation)}
-                className="bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow cursor-pointer"
-              >
-                <div className="flex items-center space-x-4">
-                  {/* Item Image */}
-                  <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={conversation.listing?.images?.[0] || 'https://images.pexels.com/photos/3448250/pexels-photo-3448250.jpeg'}
-                      alt={conversation.listing?.title || 'Item'}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+            {conversations.map(conversation => {
+              const hasImage = conversation.listing?.images && conversation.listing.images.length > 0 && conversation.listing.images[0];
+              
+              return (
+                <div
+                  key={conversation.id}
+                  onClick={() => handleConversationClick(conversation)}
+                  className="bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow cursor-pointer"
+                >
+                  <div className="flex items-center space-x-4">
+                    {/* Item Image */}
+                    <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                      {hasImage ? (
+                        <img
+                          src={conversation.listing.images[0]}
+                          alt={conversation.listing?.title || 'Item'}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center">
+                          <ImageOff className="h-6 w-6 text-gray-400 mb-1" />
+                          <p className="text-gray-500 text-xs text-center px-1">
+                            No Image
+                          </p>
+                        </div>
+                      )}
+                    </div>
 
-                  {/* Conversation Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start mb-1">
-                      <h3 className="font-semibold text-gray-800 truncate">
-                        {conversation.listing?.title || 'Unknown Item'}
-                      </h3>
-                      <div className="flex items-center space-x-2 flex-shrink-0">
-                        {conversation.unreadCount > 0 && (
-                          <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-                            {conversation.unreadCount}
+                    {/* Conversation Details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start mb-1">
+                        <h3 className="font-semibold text-gray-800 truncate">
+                          {conversation.listing?.title || 'Unknown Item'}
+                        </h3>
+                        <div className="flex items-center space-x-2 flex-shrink-0">
+                          {conversation.unreadCount > 0 && (
+                            <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                              {conversation.unreadCount}
+                            </span>
+                          )}
+                          <span className="text-sm text-gray-500">
+                            {formatTime(conversation.last_message_at)}
                           </span>
-                        )}
-                        <span className="text-sm text-gray-500">
-                          {formatTime(conversation.last_message_at)}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2 mb-2">
+                        <User className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-600">
+                          {conversation.otherUser?.email || 'Unknown User'}
                         </span>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 mb-2">
-                      <User className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">
-                        {conversation.otherUser?.email || 'Unknown User'}
-                      </span>
-                    </div>
 
-                    <p className="text-sm text-gray-600 truncate">
-                      {conversation.last_message}
-                    </p>
+                      <p className="text-sm text-gray-600 truncate">
+                        {conversation.last_message}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

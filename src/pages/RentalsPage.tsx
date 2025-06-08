@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, DollarSign, User, Package, MessageCircle } from 'lucide-react';
+import { Calendar, Clock, DollarSign, User, Package, MessageCircle, ImageOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
@@ -91,14 +91,14 @@ const RentalsPage: React.FC = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
   const getOtherUserEmail = (rental: RentalWithListing) => {
     const otherUserId = activeTab === 'renting' ? rental.owner_id : rental.renter_id;
     const otherUser = LocalStorageAuth.getUserById(otherUserId);
     return otherUser?.email || 'Unknown User';
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
   };
 
   if (!user) {
@@ -175,99 +175,112 @@ const RentalsPage: React.FC = () => {
               </Link>
             </div>
           ) : (
-            (activeTab === 'renting' ? rentingRentals : lendingRentals).map(rental => (
-              <div key={rental.id} className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex flex-col md:flex-row gap-4">
-                  {/* Item Image */}
-                  <div className="w-full md:w-32 h-32 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={rental.listing?.images[0] || 'https://images.pexels.com/photos/3448250/pexels-photo-3448250.jpeg'}
-                      alt={rental.listing?.title || 'Item'}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Rental Details */}
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-lg font-semibold">
-                        <Link 
-                          to={`/listing/${rental.listing_id}`}
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          {rental.listing?.title || 'Unknown Item'}
-                        </Link>
-                      </h3>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${getStatusColor(rental.status)}`}>
-                        {rental.status}
-                      </span>
-                    </div>
-
-                    <div className="text-sm text-gray-600 mb-3">
-                      <span className="font-medium">
-                        {activeTab === 'renting' ? 'Owner: ' : 'Renter: '}
-                      </span>
-                      {getOtherUserEmail(rental)}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-4">
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        <span>{formatDate(rental.start_date)} - {formatDate(rental.end_date)}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <DollarSign className="h-4 w-4 mr-2" />
-                        <span>${rental.total_price.toFixed(2)}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-2" />
-                        <span>Requested {formatDate(rental.created_at)}</span>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-wrap gap-2">
-                      {/* Chat Button - Always Available */}
-                      <button
-                        onClick={() => handleChatClick(rental)}
-                        className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
-                      >
-                        <MessageCircle className="h-4 w-4" />
-                        <span>Chat with {activeTab === 'renting' ? 'Owner' : 'Renter'}</span>
-                      </button>
-
-                      {/* Owner Action Buttons */}
-                      {activeTab === 'lending' && rental.status === 'pending' && (
-                        <>
-                          <button
-                            onClick={() => handleStatusUpdate(rental.id, 'approved')}
-                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => handleStatusUpdate(rental.id, 'rejected')}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
-                          >
-                            Reject
-                          </button>
-                        </>
+            (activeTab === 'renting' ? rentingRentals : lendingRentals).map(rental => {
+              const hasImage = rental.listing?.images && rental.listing.images.length > 0 && rental.listing.images[0];
+              
+              return (
+                <div key={rental.id} className="bg-white rounded-lg shadow-md p-6">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    {/* Item Image */}
+                    <div className="w-full md:w-32 h-32 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                      {hasImage ? (
+                        <img
+                          src={rental.listing.images[0]}
+                          alt={rental.listing?.title || 'Item'}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center">
+                          <ImageOff className="h-8 w-8 text-gray-400 mb-1" />
+                          <p className="text-gray-500 text-xs text-center px-2">
+                            No Image Added By Owner
+                          </p>
+                        </div>
                       )}
+                    </div>
 
-                      {/* Mark as Completed for Approved Rentals */}
-                      {rental.status === 'approved' && (
+                    {/* Rental Details */}
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-lg font-semibold">
+                          <Link 
+                            to={`/listing/${rental.listing_id}`}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            {rental.listing?.title || 'Unknown Item'}
+                          </Link>
+                        </h3>
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${getStatusColor(rental.status)}`}>
+                          {rental.status}
+                        </span>
+                      </div>
+
+                      <div className="text-sm text-gray-600 mb-3">
+                        <span className="font-medium">
+                          {activeTab === 'renting' ? 'Owner: ' : 'Renter: '}
+                        </span>
+                        {getOtherUserEmail(rental)}
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-4">
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-2" />
+                          <span>{formatDate(rental.start_date)} - {formatDate(rental.end_date)}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <DollarSign className="h-4 w-4 mr-2" />
+                          <span>${rental.total_price.toFixed(2)}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 mr-2" />
+                          <span>Requested {formatDate(rental.created_at)}</span>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex flex-wrap gap-2">
+                        {/* Chat Button - Always Available */}
                         <button
-                          onClick={() => handleStatusUpdate(rental.id, 'completed')}
-                          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm"
+                          onClick={() => handleChatClick(rental)}
+                          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
                         >
-                          Mark as Completed
+                          <MessageCircle className="h-4 w-4" />
+                          <span>Chat with {activeTab === 'renting' ? 'Owner' : 'Renter'}</span>
                         </button>
-                      )}
+
+                        {/* Owner Action Buttons */}
+                        {activeTab === 'lending' && rental.status === 'pending' && (
+                          <>
+                            <button
+                              onClick={() => handleStatusUpdate(rental.id, 'approved')}
+                              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => handleStatusUpdate(rental.id, 'rejected')}
+                              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
+
+                        {/* Mark as Completed for Approved Rentals */}
+                        {rental.status === 'approved' && (
+                          <button
+                            onClick={() => handleStatusUpdate(rental.id, 'completed')}
+                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm"
+                          >
+                            Mark as Completed
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 

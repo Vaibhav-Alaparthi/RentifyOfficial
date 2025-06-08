@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
-import { MapPin, Clock, ArrowLeft, MessageCircle } from 'lucide-react';
+import { MapPin, Clock, ArrowLeft, MessageCircle, ImageOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
@@ -64,6 +64,8 @@ const ListingDetailPage: React.FC = () => {
     return <Navigate to="/listings" />;
   }
 
+  const hasImages = listing.images && listing.images.length > 0 && listing.images[0];
+
   return (
     <div className="pt-20 pb-8">
       <div className="max-w-4xl mx-auto px-4">
@@ -82,14 +84,23 @@ const ListingDetailPage: React.FC = () => {
           {/* Images */}
           <div>
             <div className="bg-gray-200 rounded-lg overflow-hidden mb-4">
-              <img 
-                src={listing.images[activeImage] || 'https://images.pexels.com/photos/3448250/pexels-photo-3448250.jpeg'} 
-                alt={listing.title}
-                className="w-full h-96 object-cover"
-              />
+              {hasImages ? (
+                <img 
+                  src={listing.images[activeImage]} 
+                  alt={listing.title}
+                  className="w-full h-96 object-cover"
+                />
+              ) : (
+                <div className="w-full h-96 bg-gray-100 flex flex-col items-center justify-center">
+                  <ImageOff className="h-16 w-16 text-gray-400 mb-4" />
+                  <p className="text-gray-500 text-lg text-center px-4">
+                    No Image Added By Owner
+                  </p>
+                </div>
+              )}
             </div>
             
-            {listing.images.length > 1 && (
+            {hasImages && listing.images.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
                 {listing.images.map((image, index) => (
                   <button

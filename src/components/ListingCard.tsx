@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Clock } from 'lucide-react';
+import { MapPin, Clock, ImageOff } from 'lucide-react';
 
 interface Listing {
   id: string;
@@ -21,17 +21,28 @@ interface ListingCardProps {
 }
 
 const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
+  const hasImage = listing.images && listing.images.length > 0 && listing.images[0];
+
   return (
     <Link 
       to={`/listing/${listing.id}`}
       className="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
     >
       <div className="aspect-w-16 aspect-h-9">
-        <img 
-          src={listing.images[0] || 'https://images.pexels.com/photos/3448250/pexels-photo-3448250.jpeg'} 
-          alt={listing.title}
-          className="w-full h-48 object-cover"
-        />
+        {hasImage ? (
+          <img 
+            src={listing.images[0]} 
+            alt={listing.title}
+            className="w-full h-48 object-cover"
+          />
+        ) : (
+          <div className="w-full h-48 bg-gray-100 flex flex-col items-center justify-center">
+            <ImageOff className="h-12 w-12 text-gray-400 mb-2" />
+            <p className="text-gray-500 text-sm text-center px-4">
+              No Image Added By Owner
+            </p>
+          </div>
+        )}
       </div>
       
       <div className="p-4">
