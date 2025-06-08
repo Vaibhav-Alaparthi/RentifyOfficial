@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, DollarSign, User, Package } from 'lucide-react';
+import { Calendar, Clock, DollarSign, User, Package, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
+import ChatModal from '../components/ChatModal';
 
 interface Rental {
   id: string;
@@ -32,6 +33,7 @@ const RentalsPage: React.FC = () => {
   const [rentals, setRentals] = useState<RentalWithListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'renting' | 'lending'>('renting');
+  const [selectedChatListing, setSelectedChatListing] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -66,6 +68,19 @@ const RentalsPage: React.FC = () => {
     }
   };
 
+  const handleChatClick = (rental: RentalWithListing) => {
+    if (!rental.listing) return;
+    
+    // Determine who the other party is
+    const otherUserId = activeTab === 'renting' ? rental.owner_id : rental.renter_id;
+    
+    setSelectedChatListing({
+      id: rental.listing_id,
+      title: rental.listing.title,
+      owner_id: otherUserId
+    });
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800';
@@ -78,6 +93,12 @@ const RentalsPage: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
+  };
+
+  const getOtherUserEmail = (rental: RentalWithListing) => {
+    const otherUserId = activeTab === 'renting' ? rental.owner_id : rental.renter_id;
+    const otherUser = LocalStorageAuth.getUserById(otherUserId);
+    return otherUser?.email || 'Unknown User';
   };
 
   if (!user) {
@@ -182,6 +203,13 @@ const RentalsPage: React.FC = () => {
                       </span>
                     </div>
 
+                    <div className="text-sm text-gray-600 mb-3">
+                      <span className="font-medium">
+                        {activeTab === 'renting' ? 'Owner: ' : 'Renter: '}
+                      </span>
+                      {getOtherUserEmail(rental)}
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-4">
                       <div className="flex items-center">
                         <Calendar className="h-4 w-4 mr-2" />
@@ -197,39 +225,60 @@ const RentalsPage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Action Buttons for Owners */}
-                    {activeTab === 'lending' && rental.status === 'pending' && (
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleStatusUpdate(rental.id, 'approved')}
-                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleStatusUpdate(rental.id, 'rejected')}
-                          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Mark as Completed for Approved Rentals */}
-                    {rental.status === 'approved' && (
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap gap-2">
+                      {/* Chat Button - Always Available */}
                       <button
-                        onClick={() => handleStatusUpdate(rental.id, 'completed')}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                        onClick={() => handleChatClick(rental)}
+                        className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
                       >
-                        Mark as Completed
+                        <MessageCircle className="h-4 w-4" />
+                        <span>Chat with {activeTab === 'renting' ? 'Owner' : 'Renter'}</span>
                       </button>
-                    )}
+
+                      {/* Owner Action Buttons */}
+                      {activeTab === 'lending' && rental.status === 'pending' && (
+                        <>
+                          <button
+                            onClick={() => handleStatusUpdate(rental.id, 'approved')}
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleStatusUpdate(rental.id, 'rejected')}
+                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
+
+                      {/* Mark as Completed for Approved Rentals */}
+                      {rental.status === 'approved' && (
+                        <button
+                          onClick={() => handleStatusUpdate(rental.id, 'completed')}
+                          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm"
+                        >
+                          Mark as Completed
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             ))
           )}
         </div>
+
+        {/* Chat Modal */}
+        {selectedChatListing && (
+          <ChatModal
+            listing={selectedChatListing}
+            isOpen={!!selectedChatListing}
+            onClose={() => setSelectedChatListing(null)}
+          />
+        )}
       </div>
     </div>
   );
