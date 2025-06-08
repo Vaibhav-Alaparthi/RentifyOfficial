@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, X } from 'lucide-react';
 import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
+import ImageUpload from '../components/ImageUpload';
 
 const CreateListingPage: React.FC = () => {
   const { user } = useAuth();
@@ -27,20 +27,10 @@ const CreateListingPage: React.FC = () => {
     }));
   };
 
-  const handleImageAdd = () => {
-    const imageUrl = prompt('Enter image URL:');
-    if (imageUrl) {
-      setFormData(prev => ({
-        ...prev,
-        images: [...prev.images, imageUrl]
-      }));
-    }
-  };
-
-  const handleImageRemove = (index: number) => {
+  const handleImagesChange = (images: string[]) => {
     setFormData(prev => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images
     }));
   };
 
@@ -58,7 +48,7 @@ const CreateListingPage: React.FC = () => {
         location: formData.location,
         category: formData.category,
         condition: formData.condition,
-        images: formData.images.length > 0 ? formData.images : ['https://images.pexels.com/photos/3448250/pexels-photo-3448250.jpeg'],
+        images: formData.images.length > 0 ? formData.images : [],
         owner_id: user.id
       });
 
@@ -205,33 +195,14 @@ const CreateListingPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
               Images
             </label>
-            <div className="space-y-2">
-              {formData.images.map((image, index) => (
-                <div key={index} className="flex items-center space-x-2 p-2 bg-gray-50 rounded">
-                  <img src={image} alt={`Preview ${index + 1}`} className="w-12 h-12 object-cover rounded" />
-                  <span className="flex-1 text-sm text-gray-600 truncate">{image}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleImageRemove(index)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-              
-              <button
-                type="button"
-                onClick={handleImageAdd}
-                className="flex items-center space-x-2 text-blue-600 hover:text-blue-800"
-              >
-                <Upload className="h-4 w-4" />
-                <span>Add Image URL</span>
-              </button>
-            </div>
+            <ImageUpload
+              images={formData.images}
+              onImagesChange={handleImagesChange}
+              maxImages={5}
+            />
           </div>
 
           <div className="flex space-x-4">
