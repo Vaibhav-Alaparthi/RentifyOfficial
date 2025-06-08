@@ -1,3 +1,9 @@
+export interface User {
+  id: string;
+  email: string;
+  createdAt: string;
+}
+
 export interface Listing {
   id: string;
   title: string;
@@ -10,15 +16,6 @@ export interface Listing {
   images: string[];
   owner_id: string;
   created_at: string;
-  updated_at: string;
-}
-
-export interface Profile {
-  id: string;
-  username: string | null;
-  avatar_url: string | null;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface Message {
@@ -28,25 +25,28 @@ export interface Message {
   listing_id: string;
   content: string;
   created_at: string;
+  read: boolean;
 }
 
 export interface Rental {
   id: string;
   listing_id: string;
   renter_id: string;
+  owner_id: string;
   start_date: string;
   end_date: string;
   status: 'pending' | 'approved' | 'rejected' | 'completed';
-  payment_status: 'pending' | 'paid' | 'refunded';
+  total_price: number;
   created_at: string;
   updated_at: string;
 }
 
-export interface Review {
+export interface Conversation {
   id: string;
   listing_id: string;
-  reviewer_id: string;
-  rating: number;
-  comment: string | null;
+  participant1_id: string;
+  participant2_id: string;
+  last_message: string;
+  last_message_at: string;
   created_at: string;
 }
