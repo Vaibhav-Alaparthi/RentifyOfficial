@@ -11,7 +11,10 @@ export interface Listing {
   price: number;
   price_unit: 'hour' | 'day' | 'week';
   location: string;
-  category: 'sports' | 'tools' | 'electronics' | 'other';
+  city?: string;
+  state?: string;
+  country?: string;
+  category: 'sports' | 'tools' | 'electronics' | 'outdoor' | 'automotive' | 'home' | 'other';
   condition: 'like new' | 'good' | 'fair';
   images: string[];
   owner_id: string;

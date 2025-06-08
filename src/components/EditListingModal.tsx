@@ -10,6 +10,9 @@ interface Listing {
   price: number;
   price_unit: string;
   location: string;
+  city?: string;
+  state?: string;
+  country?: string;
   category: string;
   condition: string;
   images: string[];
@@ -36,7 +39,9 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
     description: listing.description,
     price: listing.price.toString(),
     price_unit: listing.price_unit,
-    location: listing.location,
+    city: listing.city || '',
+    state: listing.state || '',
+    country: listing.country || 'United States',
     category: listing.category,
     condition: listing.condition,
     images: [...listing.images]
@@ -62,12 +67,17 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
     setLoading(true);
 
     try {
+      const location = `${formData.city}, ${formData.state}, ${formData.country}`;
+      
       const updatedListing = LocalStorageAuth.updateListing(listing.id, {
         title: formData.title,
         description: formData.description,
         price: parseFloat(formData.price),
         price_unit: formData.price_unit,
-        location: formData.location,
+        location: location,
+        city: formData.city,
+        state: formData.state,
+        country: formData.country,
         category: formData.category,
         condition: formData.condition,
         images: formData.images
@@ -171,19 +181,64 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
             </div>
           </div>
 
-          <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-              Location *
-            </label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleInputChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          {/* Location Section */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="text-lg font-medium text-blue-900 mb-3">Location Information</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+                  City *
+                </label>
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g., Seattle"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
+                  State/Province *
+                </label>
+                <input
+                  type="text"
+                  id="state"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g., WA"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
+                  Country *
+                </label>
+                <select
+                  id="country"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="United States">United States</option>
+                  <option value="Canada">Canada</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                  <option value="Australia">Australia</option>
+                  <option value="Germany">Germany</option>
+                  <option value="France">France</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -198,9 +253,12 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="sports">Sports</option>
-                <option value="tools">Tools</option>
+                <option value="sports">Sports & Recreation</option>
+                <option value="tools">Tools & Equipment</option>
                 <option value="electronics">Electronics</option>
+                <option value="outdoor">Outdoor & Camping</option>
+                <option value="automotive">Automotive</option>
+                <option value="home">Home & Garden</option>
                 <option value="other">Other</option>
               </select>
             </div>
