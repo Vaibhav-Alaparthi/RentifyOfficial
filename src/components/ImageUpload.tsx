@@ -173,12 +173,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         )}
       </div>
 
-      {/* Upload Guidelines */}
-      <div className="text-xs text-gray-400 space-y-1">
-        <p>• Supported formats: JPG, PNG, GIF, WebP</p>
-        <p>• Maximum file size: 5MB per image</p>
-        <p>• Maximum {maxImages} images per listing</p>
-      </div>
     </div>
   );
 };
