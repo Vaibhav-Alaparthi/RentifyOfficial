@@ -1,6 +1,6 @@
 /*
   Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
-  6/7/25
+  6/3/25
 
   This file provides a modal interface for users to rent a listing by selecting dates and submitting a rental request in the renting marketplace website.
 */
