@@ -1,6 +1,6 @@
 /*
   Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
-  6/9/25
+  6/7/25
 
   This file provides an authentication context for managing user state and authentication methods in the renting marketplace website using React Context API.
 */
