@@ -1,6 +1,6 @@
 /*
   Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
-  6/9/25
+  6/7/25
 
   This file defines the LocalStorageAuth class, providing static methods for managing users, listings, rentals, messages, and conversations in localStorage for the renting marketplace website.
   This file defines the LocalStorageAuth class, which provides static methods for managing users, listings, rentals, messages, and conversations in localStorage.
