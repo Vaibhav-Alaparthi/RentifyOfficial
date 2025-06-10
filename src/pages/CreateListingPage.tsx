@@ -1,3 +1,9 @@
+/*
+  Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
+  6/9/25
+
+  This file provides a form interface for users to create a new rental listing in the renting marketplace website, handling form state, image uploads, and listing creation.
+*/
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LocalStorageAuth } from '../lib/localStorage';

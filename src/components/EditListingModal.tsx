@@ -1,3 +1,9 @@
+/*
+  Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
+  6/4/25
+
+  This file provides a modal interface for users to edit an existing rental listing in the renting marketplace website.
+*/
 // EditListingModal component allows users to edit an existing listing in a modal dialog.
 import React, { useState } from 'react';
 import { X } from 'lucide-react';

@@ -1,4 +1,9 @@
-// RentalsPage displays all rentals for the current user, separated into 'renting' and 'lending' tabs.
+/*
+  Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
+  6/9/25
+
+  This file displays all rentals for the current user in the renting marketplace website, organized into 'renting' and 'lending' tabs with options to manage rental status and initiate chats.
+*/
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, DollarSign, User, Package, MessageCircle, ImageOff } from 'lucide-react';
 import { Link } from 'react-router-dom';

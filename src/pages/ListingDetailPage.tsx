@@ -1,3 +1,9 @@
+/*
+  Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
+  6/9/25
+
+  This file displays detailed information about a single rental listing in the renting marketplace website, including images, owner actions, and modals for rental, chat, edit, and delete operations.
+*/
 import React, { useState, useEffect } from 'react';
 import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import { MapPin, Clock, ArrowLeft, MessageCircle, ImageOff, Edit, Trash2 } from 'lucide-react';

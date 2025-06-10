@@ -1,3 +1,9 @@
+/*
+  Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
+  6/9/25
+
+  This file provides an authentication context for managing user state and authentication methods in the renting marketplace website using React Context API.
+*/
 // AuthContext provides authentication state and methods to the app using React Context API.
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { LocalStorageAuth } from '../lib/localStorage';

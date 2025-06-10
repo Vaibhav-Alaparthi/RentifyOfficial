@@ -1,3 +1,9 @@
+/*
+  Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
+  6/9/25
+
+  This file displays a summary card for a single rental listing in the renting marketplace website, including image, title, price, and category.
+*/
 // ListingCard component displays a summary card for a single listing, including image, title, price, and category.
 import React from 'react';
 import { Link } from 'react-router-dom';

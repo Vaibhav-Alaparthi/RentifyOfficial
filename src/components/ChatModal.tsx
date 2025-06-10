@@ -1,3 +1,9 @@
+/*
+  Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
+  6/4/25
+
+  This file provides a modal chat interface for users to communicate about a rental listing in the renting marketplace website.
+*/
 // ChatModal component provides a modal chat interface for users to communicate about a listing.
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, MessageCircle } from 'lucide-react';

@@ -1,3 +1,9 @@
+/*
+  Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
+  6/9/25
+
+  This file provides the main navigation bar for the renting marketplace website, including links and user actions.
+*/
 // Navbar component provides the main navigation bar for the app, including links and user actions.
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';

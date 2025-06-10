@@ -1,3 +1,10 @@
+/*
+  Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
+  6/9/25
+
+  This file defines TypeScript interfaces for User, Listing, Message, Rental, and Conversation types used across the renting marketplace website.
+*/
+
 // User type represents an authenticated user in the system.
 export interface User {
   id: string;

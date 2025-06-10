@@ -1,3 +1,9 @@
+/*
+  Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
+  6/9/25
+
+  This file provides a modal interface for users to rent a listing by selecting dates and submitting a rental request in the renting marketplace website.
+*/
 import React, { useState } from 'react';
 import { X, Calendar, DollarSign } from 'lucide-react';
 import { LocalStorageAuth } from '../lib/localStorage';

@@ -1,4 +1,9 @@
-// ListingsPage displays all available rental listings with search and filter functionality.
+/*
+  Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
+  6/9/25
+
+  This file displays all available rental listings in the renting marketplace website with search and filter functionality to browse items.
+*/
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, MapPin, X } from 'lucide-react';
 import { LocalStorageAuth } from '../lib/localStorage';

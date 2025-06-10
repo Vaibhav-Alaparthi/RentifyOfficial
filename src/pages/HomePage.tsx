@@ -1,5 +1,9 @@
-// HomePage.tsx
-// This file defines the main landing page for the Rentify app. It displays a hero section and a features section to introduce users to the platform.
+/*
+  Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
+  6/9/25
+
+  This file defines the main landing page for the Rentify app in the renting marketplace website, featuring a hero section and a features section to introduce users to the platform.
+*/
 
 import React from 'react';
 import { Link } from 'react-router-dom';
