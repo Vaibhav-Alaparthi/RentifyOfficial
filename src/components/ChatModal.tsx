@@ -1,0 +1,210 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Send, MessageCircle } from 'lucide-react';
+import { LocalStorageAuth } from '../lib/localStorage';
+import { useAuth } from '../contexts/AuthContext';
+
+interface Message {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  listing_id: string;
+  content: string;
+  created_at: string;
+  read: boolean;
+}
+
+interface User {
+  id: string;
+  email: string;
+  createdAt: string;
+}
+
+interface Listing {
+  id: string;
+  title: string;
+  owner_id: string;
+}
+
+interface ChatModalProps {
+  listing: Listing;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const ChatModal: React.FC<ChatModalProps> = ({ listing, isOpen, onClose }) => {
+  const { user } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [otherUser, setOtherUser] = useState<User | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen && user) {
+      loadMessages();
+      loadOtherUser();
+    }
+  }, [isOpen, user, listing.id]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const loadMessages = () => {
+    if (!user) return;
+    
+    const conversationMessages = LocalStorageAuth.getMessagesByConversation(
+      user.id,
+      listing.owner_id,
+      listing.id
+    );
+    setMessages(conversationMessages);
+    
+    // Mark messages as read
+    LocalStorageAuth.markMessagesAsRead(user.id, listing.owner_id, listing.id);
+  };
+
+  const loadOtherUser = () => {
+    const owner = LocalStorageAuth.getUserById(listing.owner_id);
+    setOtherUser(owner);
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !newMessage.trim()) return;
+
+    setLoading(true);
+    try {
+      LocalStorageAuth.createMessage({
+        sender_id: user.id,
+        receiver_id: listing.owner_id,
+        listing_id: listing.id,
+        content: newMessage.trim()
+      });
+
+      setNewMessage('');
+      loadMessages();
+    } catch (error) {
+      console.error('Error sending message:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString();
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-md w-full h-96 flex flex-col">
+        {/* Header */}
+        <div className="flex justify-between items-center p-4 border-b">
+          <div className="flex items-center space-x-3">
+            <MessageCircle className="h-5 w-5 text-blue-600" />
+            <div>
+              <h2 className="font-semibold">{listing.title}</h2>
+              <p className="text-sm text-gray-600">
+                Chat with {otherUser?.email || 'Owner'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {messages.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">
+              <MessageCircle className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+              <p>No messages yet. Start the conversation!</p>
+            </div>
+          ) : (
+            messages.map((message, index) => {
+              const isCurrentUser = message.sender_id === user?.id;
+              const showDate = index === 0 || 
+                formatDate(message.created_at) !== formatDate(messages[index - 1].created_at);
+
+              return (
+                <div key={message.id}>
+                  {showDate && (
+                    <div className="text-center text-xs text-gray-500 my-2">
+                      {formatDate(message.created_at)}
+                    </div>
+                  )}
+                  <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
+                    <div
+                      className={`max-w-xs px-3 py-2 rounded-lg ${
+                        isCurrentUser
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      <p className="text-sm">{message.content}</p>
+                      <p className={`text-xs mt-1 ${
+                        isCurrentUser ? 'text-blue-100' : 'text-gray-500'
+                      }`}>
+                        {formatTime(message.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Message Input */}
+        <form onSubmit={handleSendMessage} className="p-4 border-t">
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type a message..."
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            />
+            <button
+              type="submit"
+              disabled={loading || !newMessage.trim()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default ChatModal;
