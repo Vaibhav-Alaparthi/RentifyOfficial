@@ -1,12 +1,15 @@
+// AuthContext provides authentication state and methods to the app using React Context API.
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { LocalStorageAuth } from '../lib/localStorage';
 
+// User type represents an authenticated user.
 interface User {
   id: string;
   email: string;
   createdAt: string;
 }
 
+// AuthContextType defines the shape of the authentication context.
 interface AuthContextType {
   user: User | null;
   loading: boolean;
@@ -15,8 +18,10 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
+// Create the AuthContext
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// AuthProvider wraps the app and provides authentication state and actions
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   }, []);
 
+  // Handles user sign up
   const signUp = async (email: string, password: string) => {
     try {
       const newUser = await LocalStorageAuth.signUp(email, password);
@@ -37,6 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Handles user sign in
   const signIn = async (email: string, password: string) => {
     try {
       const user = await LocalStorageAuth.signIn(email, password);
@@ -46,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Handles user sign out
   const signOut = async () => {
     try {
       await LocalStorageAuth.signOut();
@@ -62,6 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Custom hook to use the AuthContext
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

@@ -3,6 +3,7 @@ import { X, Calendar, DollarSign } from 'lucide-react';
 import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
 
+// RentalModal component provides a modal for users to rent a listing by selecting dates and submitting a rental request.
 interface Listing {
   id: string;
   title: string;
@@ -11,6 +12,7 @@ interface Listing {
   owner_id: string;
 }
 
+// Props for RentalModal: listing info, modal state, close handler, and rental creation callback.
 interface RentalModalProps {
   listing: Listing;
   isOpen: boolean;
@@ -18,6 +20,7 @@ interface RentalModalProps {
   onRentalCreated: () => void;
 }
 
+// Main RentalModal component
 const RentalModal: React.FC<RentalModalProps> = ({ listing, isOpen, onClose, onRentalCreated }) => {
   const { user } = useAuth();
   const [startDate, setStartDate] = useState('');
@@ -25,6 +28,7 @@ const RentalModal: React.FC<RentalModalProps> = ({ listing, isOpen, onClose, onR
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Calculates the total price based on selected dates and price unit
   const calculateTotalPrice = () => {
     if (!startDate || !endDate) return 0;
     
@@ -45,6 +49,7 @@ const RentalModal: React.FC<RentalModalProps> = ({ listing, isOpen, onClose, onR
     return listing.price * multiplier;
   };
 
+  // Handles rental form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -93,6 +98,7 @@ const RentalModal: React.FC<RentalModalProps> = ({ listing, isOpen, onClose, onR
     }
   };
 
+  // If modal is not open, render nothing
   if (!isOpen) return null;
 
   const totalPrice = calculateTotalPrice();
@@ -100,6 +106,7 @@ const RentalModal: React.FC<RentalModalProps> = ({ listing, isOpen, onClose, onR
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-md w-full p-6">
+        {/* Modal Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Rent {listing.title}</h2>
           <button
@@ -110,12 +117,14 @@ const RentalModal: React.FC<RentalModalProps> = ({ listing, isOpen, onClose, onR
           </button>
         </div>
 
+        {/* Error Message */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
             {error}
           </div>
         )}
 
+        {/* Rental Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">

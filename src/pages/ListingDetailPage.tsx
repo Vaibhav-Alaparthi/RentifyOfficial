@@ -8,6 +8,7 @@ import RentalModal from '../components/RentalModal';
 import ChatModal from '../components/ChatModal';
 import EditListingModal from '../components/EditListingModal';
 
+// ListingDetailPage displays detailed information about a single listing, including images, owner actions, and modals for rental, chat, edit, and delete.
 interface Listing {
   id: string;
   title: string;
@@ -22,6 +23,7 @@ interface Listing {
   created_at: string;
 }
 
+// Main ListingDetailPage component
 const ListingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -40,6 +42,7 @@ const ListingDetailPage: React.FC = () => {
     }
   }, [id]);
 
+  // Fetches the listing details by ID
   const fetchListing = () => {
     try {
       const foundListing = LocalStorageAuth.getListingById(id!);
@@ -51,15 +54,18 @@ const ListingDetailPage: React.FC = () => {
     }
   };
 
+  // Handles rental creation callback
   const handleRentalCreated = () => {
     // Refresh or show success message
     alert('Rental request submitted successfully!');
   };
 
+  // Handles listing update callback
   const handleListingUpdated = (updatedListing: Listing) => {
     setListing(updatedListing);
   };
 
+  // Handles listing deletion
   const handleDeleteListing = () => {
     if (!listing || !user || listing.owner_id !== user.id) return;
 
@@ -72,6 +78,7 @@ const ListingDetailPage: React.FC = () => {
     }
   };
 
+  // Checks if the current user is the owner of the listing
   const isOwner = user && listing && user.id === listing.owner_id;
 
   if (loading) {
@@ -86,6 +93,7 @@ const ListingDetailPage: React.FC = () => {
     return <Navigate to="/listings" />;
   }
 
+  // Check if the listing has images
   const hasImages = listing.images && listing.images.length > 0 && listing.images[0];
 
   return (

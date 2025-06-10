@@ -1,9 +1,11 @@
+// User type represents an authenticated user in the system.
 export interface User {
   id: string;
   email: string;
   createdAt: string;
 }
 
+// Listing type represents a rental listing with all its details.
 export interface Listing {
   id: string;
   title: string;
@@ -21,6 +23,7 @@ export interface Listing {
   created_at: string;
 }
 
+// Message type represents a chat message between users about a listing.
 export interface Message {
   id: string;
   sender_id: string;
@@ -31,6 +34,7 @@ export interface Message {
   read: boolean;
 }
 
+// Rental type represents a rental transaction between users.
 export interface Rental {
   id: string;
   listing_id: string;
@@ -44,6 +48,7 @@ export interface Rental {
   updated_at: string;
 }
 
+// Conversation type represents a chat conversation between two users about a listing.
 export interface Conversation {
   id: string;
   listing_id: string;

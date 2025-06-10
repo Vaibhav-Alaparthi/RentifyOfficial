@@ -1,3 +1,6 @@
+// This file defines the LocalStorageAuth class, which provides static methods for managing users, listings, rentals, messages, and conversations in localStorage.
+// It acts as a mock backend for authentication, CRUD operations, and chat features.
+
 interface User {
   id: string;
   email: string;
@@ -54,6 +57,7 @@ interface Conversation {
   created_at: string;
 }
 
+// LocalStorageAuth provides static methods for all app data operations using localStorage.
 export class LocalStorageAuth {
   private static USERS_KEY = 'rentease_users';
   private static CURRENT_USER_KEY = 'rentease_current_user';

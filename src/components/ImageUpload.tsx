@@ -1,20 +1,24 @@
+// ImageUpload component allows users to upload, preview, and remove images for a listing.
 import React, { useState, useRef } from 'react';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 
+// Props for ImageUpload: current images, change handler, and optional max image count.
 interface ImageUploadProps {
   images: string[];
   onImagesChange: (images: string[]) => void;
   maxImages?: number;
 }
 
+// Main ImageUpload component
 const ImageUpload: React.FC<ImageUploadProps> = ({ 
   images, 
   onImagesChange, 
   maxImages = 5 
 }) => {
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false); // Loading state for uploads
+  const fileInputRef = useRef<HTMLInputElement>(null); // Ref for file input
 
+  // Handles file selection and uploads images as base64
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
@@ -58,6 +62,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     }
   };
 
+  // Converts a File to a base64 string
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -67,6 +72,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     });
   };
 
+  // Prompts user to add an image by URL
   const handleUrlAdd = () => {
     const imageUrl = prompt('Enter image URL:');
     if (imageUrl && imageUrl.trim()) {
@@ -75,11 +81,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     }
   };
 
+  // Removes an image at the given index
   const handleImageRemove = (index: number) => {
     const updatedImages = images.filter((_, i) => i !== index);
     onImagesChange(updatedImages);
   };
 
+  // Whether more images can be added
   const canAddMore = images.length < maxImages;
 
   return (
@@ -95,6 +103,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                   alt={`Preview ${index + 1}`} 
                   className="w-full h-full object-cover"
                   onError={(e) => {
+                    // Fallback to placeholder if image fails to load
                     const target = e.target as HTMLImageElement;
                     target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxIDEyVjdBMiAyIDAgMCAwIDE5IDVINUEyIDIgMCAwIDAgMyA3VjE3QTIgMiAwIDAgMCA1IDE5SDE0IiBzdHJva2U9IiM5Q0E3QjciIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxjaXJjbGUgY3g9IjkiIGN5PSI5IiByPSIyIiBzdHJva2U9IiM5Q0E3QjciIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Ik0yMSAxNUwxNiAxMEw1IDIxIiBzdHJva2U9IiM5Q0E3QjciIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=';
                   }}

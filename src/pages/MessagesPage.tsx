@@ -1,3 +1,4 @@
+// MessagesPage displays all user conversations and allows opening a chat modal for each conversation.
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageCircle, Clock, User, ImageOff } from 'lucide-react';
@@ -5,6 +6,7 @@ import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
 import ChatModal from '../components/ChatModal';
 
+// Conversation interface represents a chat conversation between two users about a listing.
 interface Conversation {
   id: string;
   listing_id: string;
@@ -15,24 +17,31 @@ interface Conversation {
   created_at: string;
 }
 
+// ConversationWithDetails extends Conversation with listing, other user, and unread count.
 interface ConversationWithDetails extends Conversation {
   listing: any;
   otherUser: any;
   unreadCount: number;
 }
 
+// Main MessagesPage component
 const MessagesPage: React.FC = () => {
   const { user } = useAuth();
+  // State for all conversations with details
   const [conversations, setConversations] = useState<ConversationWithDetails[]>([]);
+  // Loading state for data fetch
   const [loading, setLoading] = useState(true);
+  // State for the currently selected conversation (for chat modal)
   const [selectedConversation, setSelectedConversation] = useState<ConversationWithDetails | null>(null);
 
+  // Load conversations when user changes
   useEffect(() => {
     if (user) {
       loadConversations();
     }
   }, [user]);
 
+  // Loads all conversations for the user, including listing and other user details
   const loadConversations = () => {
     if (!user) return;
 
@@ -63,6 +72,7 @@ const MessagesPage: React.FC = () => {
     }
   };
 
+  // Formats the time for display in the conversation list
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -77,15 +87,18 @@ const MessagesPage: React.FC = () => {
     }
   };
 
+  // Handles clicking a conversation to open the chat modal
   const handleConversationClick = (conversation: ConversationWithDetails) => {
     setSelectedConversation(conversation);
   };
 
+  // Handles closing the chat modal and refreshes conversations
   const handleCloseChat = () => {
     setSelectedConversation(null);
     loadConversations(); // Refresh to update unread counts
   };
 
+  // If user is not signed in, prompt to sign in
   if (!user) {
     return (
       <div className="pt-20 pb-8">
@@ -100,6 +113,7 @@ const MessagesPage: React.FC = () => {
     );
   }
 
+  // Show loading spinner while fetching
   if (loading) {
     return (
       <div className="pt-20 flex justify-center items-center min-h-screen">
@@ -113,6 +127,7 @@ const MessagesPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4">
         <h1 className="text-3xl font-bold mb-8">Messages</h1>
 
+        {/* Empty state if no conversations */}
         {conversations.length === 0 ? (
           <div className="text-center py-12">
             <MessageCircle className="h-16 w-16 mx-auto mb-4 text-gray-300" />
@@ -126,6 +141,7 @@ const MessagesPage: React.FC = () => {
             </Link>
           </div>
         ) : (
+          // List of conversations
           <div className="space-y-2">
             {conversations.map(conversation => {
               const hasImage = conversation.listing?.images && conversation.listing.images.length > 0 && conversation.listing.images[0];
@@ -137,7 +153,7 @@ const MessagesPage: React.FC = () => {
                   className="bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <div className="flex items-center space-x-4">
-                    {/* Item Image */}
+                    {/* Item Image or Placeholder */}
                     <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
                       {hasImage ? (
                         <img
@@ -191,7 +207,7 @@ const MessagesPage: React.FC = () => {
           </div>
         )}
 
-        {/* Chat Modal */}
+        {/* Chat Modal for selected conversation */}
         {selectedConversation && (
           <ChatModal
             listing={{

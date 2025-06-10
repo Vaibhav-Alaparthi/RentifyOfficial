@@ -1,8 +1,10 @@
+// ListingsPage displays all available rental listings with search and filter functionality.
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, MapPin, X } from 'lucide-react';
 import { LocalStorageAuth } from '../lib/localStorage';
 import ListingCard from '../components/ListingCard';
 
+// Listing interface defines the structure of a rental listing.
 interface Listing {
   id: string;
   title: string;
@@ -20,9 +22,13 @@ interface Listing {
   created_at: string;
 }
 
+// Main ListingsPage component
 const ListingsPage: React.FC = () => {
+  // State for all listings
   const [listings, setListings] = useState<Listing[]>([]);
+  // Loading state for data fetch
   const [loading, setLoading] = useState(true);
+  // Search and filter states
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
@@ -30,20 +36,22 @@ const ListingsPage: React.FC = () => {
   const [selectedCountry, setSelectedCountry] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Get unique location values for filters
+  // States for available filter options
   const [availableCities, setAvailableCities] = useState<string[]>([]);
   const [availableStates, setAvailableStates] = useState<string[]>([]);
   const [availableCountries, setAvailableCountries] = useState<string[]>([]);
 
+  // Fetch listings on mount
   useEffect(() => {
     fetchListings();
   }, []);
 
+  // Update available filter options when listings change
   useEffect(() => {
-    // Update available locations when listings change
     updateAvailableLocations();
   }, [listings]);
 
+  // Fetch all listings from local storage
   const fetchListings = () => {
     try {
       const allListings = LocalStorageAuth.getListings();
@@ -55,6 +63,7 @@ const ListingsPage: React.FC = () => {
     }
   };
 
+  // Update available cities, states, and countries for filters
   const updateAvailableLocations = () => {
     const cities = new Set<string>();
     const states = new Set<string>();
@@ -71,6 +80,7 @@ const ListingsPage: React.FC = () => {
     setAvailableCountries(Array.from(countries).sort());
   };
 
+  // Filter listings based on search and selected filters
   const filteredListings = listings.filter(listing => {
     const matchesSearch = listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          listing.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -82,6 +92,7 @@ const ListingsPage: React.FC = () => {
     return matchesSearch && matchesCategory && matchesCity && matchesState && matchesCountry;
   });
 
+  // Clear all filters and search
   const clearFilters = () => {
     setSelectedCategory('');
     setSelectedCity('');
@@ -90,8 +101,10 @@ const ListingsPage: React.FC = () => {
     setSearchTerm('');
   };
 
+  // Check if any filters or search are active
   const hasActiveFilters = selectedCategory || selectedCity || selectedState || selectedCountry || searchTerm;
 
+  // Show loading spinner while fetching
   if (loading) {
     return (
       <div className="pt-20 flex justify-center items-center min-h-screen">
@@ -106,7 +119,7 @@ const ListingsPage: React.FC = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">Browse Items Near You</h1>
           
-          {/* Search Bar */}
+          {/* Search Bar and Filters Button */}
           <div className="flex flex-col lg:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -326,7 +339,7 @@ const ListingsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Listings Grid */}
+        {/* Listings Grid or Empty State */}
         {filteredListings.length === 0 ? (
           <div className="text-center py-12">
             <MapPin className="h-16 w-16 mx-auto mb-4 text-gray-300" />
@@ -344,6 +357,7 @@ const ListingsPage: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Render a card for each filtered listing */}
             {filteredListings.map(listing => (
               <ListingCard key={listing.id} listing={listing} />
             ))}

@@ -1,12 +1,15 @@
+// Navbar component provides the main navigation bar for the app, including links and user actions.
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Home, Plus, User, LogOut, Calendar, MessageCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
+// Main Navbar component
 const Navbar: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
+  // Handles user sign out and redirects to home
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -20,12 +23,14 @@ const Navbar: React.FC = () => {
     <nav className="bg-white shadow-sm border-b">
       <div className="max-w-6xl mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
+          {/* Logo and Home Link */}
           <Link to="/" className="flex items-center space-x-2">
             <Home className="h-6 w-6 text-blue-600" />
             <span className="text-xl font-bold text-gray-800">Rentify</span>
           </Link>
           
           <div className="flex items-center space-x-4">
+            {/* Browse Items Link */}
             <Link 
               to="/listings" 
               className="text-gray-600 hover:text-blue-600 font-medium"
@@ -35,6 +40,7 @@ const Navbar: React.FC = () => {
             
             {user ? (
               <>
+                {/* Messages Link */}
                 <Link 
                   to="/messages" 
                   className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 font-medium"
@@ -43,6 +49,7 @@ const Navbar: React.FC = () => {
                   <span>Messages</span>
                 </Link>
 
+                {/* My Rentals Link */}
                 <Link 
                   to="/rentals" 
                   className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 font-medium"
@@ -51,6 +58,7 @@ const Navbar: React.FC = () => {
                   <span>My Rentals</span>
                 </Link>
                 
+                {/* Create Listing Button */}
                 <Link 
                   to="/create-listing" 
                   className="flex items-center space-x-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
@@ -59,6 +67,7 @@ const Navbar: React.FC = () => {
                   <span>List Item</span>
                 </Link>
                 
+                {/* User Info and Sign Out */}
                 <div className="flex items-center space-x-2">
                   <User className="h-5 w-5 text-gray-600" />
                   <span className="text-sm text-gray-600">{user.email}</span>
@@ -71,6 +80,7 @@ const Navbar: React.FC = () => {
                 </div>
               </>
             ) : (
+              // Sign In Button
               <Link 
                 to="/auth" 
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"

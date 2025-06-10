@@ -1,8 +1,10 @@
+// ChatModal component provides a modal chat interface for users to communicate about a listing.
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, MessageCircle } from 'lucide-react';
 import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
 
+// Message interface represents a single chat message.
 interface Message {
   id: string;
   sender_id: string;
@@ -13,32 +15,37 @@ interface Message {
   read: boolean;
 }
 
+// User interface represents a user in the system.
 interface User {
   id: string;
   email: string;
   createdAt: string;
 }
 
+// Listing interface represents a rental listing.
 interface Listing {
   id: string;
   title: string;
   owner_id: string;
 }
 
+// Props for ChatModal: listing info, modal open state, and close handler.
 interface ChatModalProps {
   listing: Listing;
   isOpen: boolean;
   onClose: () => void;
 }
 
+// Main ChatModal component
 const ChatModal: React.FC<ChatModalProps> = ({ listing, isOpen, onClose }) => {
-  const { user } = useAuth();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [otherUser, setOtherUser] = useState<User | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth(); // Get current user from AuthContext
+  const [messages, setMessages] = useState<Message[]>([]); // State for chat messages
+  const [newMessage, setNewMessage] = useState(''); // State for new message input
+  const [loading, setLoading] = useState(false); // Loading state for sending messages
+  const [otherUser, setOtherUser] = useState<User | null>(null); // State for the other user in chat
+  const messagesEndRef = useRef<HTMLDivElement>(null); // Ref for scrolling to bottom
 
+  // Load messages and other user info when modal opens or listing/user changes
   useEffect(() => {
     if (isOpen && user) {
       loadMessages();
@@ -46,10 +53,12 @@ const ChatModal: React.FC<ChatModalProps> = ({ listing, isOpen, onClose }) => {
     }
   }, [isOpen, user, listing.id]);
 
+  // Scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  // Loads messages for the current conversation from local storage
   const loadMessages = () => {
     if (!user) return;
     
@@ -64,15 +73,18 @@ const ChatModal: React.FC<ChatModalProps> = ({ listing, isOpen, onClose }) => {
     LocalStorageAuth.markMessagesAsRead(user.id, listing.owner_id, listing.id);
   };
 
+  // Loads the other user (listing owner) info
   const loadOtherUser = () => {
     const owner = LocalStorageAuth.getUserById(listing.owner_id);
     setOtherUser(owner);
   };
 
+  // Scrolls the chat to the latest message
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Handles sending a new message
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !newMessage.trim()) return;
@@ -95,11 +107,13 @@ const ChatModal: React.FC<ChatModalProps> = ({ listing, isOpen, onClose }) => {
     }
   };
 
+  // Formats a date string to a short time (e.g., 14:30)
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  // Formats a date string to Today, Yesterday, or a date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const today = new Date();
@@ -115,6 +129,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ listing, isOpen, onClose }) => {
     }
   };
 
+  // If modal is not open, render nothing
   if (!isOpen) return null;
 
   return (
@@ -147,6 +162,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ listing, isOpen, onClose }) => {
               <p>No messages yet. Start the conversation!</p>
             </div>
           ) : (
+            // Render each message, grouping by date and aligning by sender
             messages.map((message, index) => {
               const isCurrentUser = message.sender_id === user?.id;
               const showDate = index === 0 || 

@@ -4,6 +4,8 @@ import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
 import ImageUpload from '../components/ImageUpload';
 
+// CreateListingPage provides a form for users to create a new rental listing.
+// It handles form state, image uploads, and listing creation logic.
 const CreateListingPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ const CreateListingPage: React.FC = () => {
     images: [] as string[]
   });
 
+  // Handles input changes for form fields
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -29,6 +32,7 @@ const CreateListingPage: React.FC = () => {
     }));
   };
 
+  // Handles image uploads/changes
   const handleImagesChange = (images: string[]) => {
     setFormData(prev => ({
       ...prev,
@@ -36,6 +40,7 @@ const CreateListingPage: React.FC = () => {
     }));
   };
 
+  // Handles form submission to create a new listing
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -78,7 +83,9 @@ const CreateListingPage: React.FC = () => {
       <div className="max-w-2xl mx-auto px-4">
         <h1 className="text-3xl font-bold mb-8">List Your Item</h1>
 
+        {/* Listing Creation Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Title Input */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
               Item Title *
@@ -95,6 +102,7 @@ const CreateListingPage: React.FC = () => {
             />
           </div>
 
+          {/* Description Input */}
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
               Description *
@@ -111,6 +119,7 @@ const CreateListingPage: React.FC = () => {
             />
           </div>
 
+          {/* Price, Price Unit, and Location Inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
@@ -210,6 +219,7 @@ const CreateListingPage: React.FC = () => {
             </div>
           </div>
 
+          {/* Category and Condition Inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
@@ -250,6 +260,7 @@ const CreateListingPage: React.FC = () => {
             </div>
           </div>
 
+          {/* Images Upload Section */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Images
@@ -261,6 +272,7 @@ const CreateListingPage: React.FC = () => {
             />
           </div>
 
+          {/* Action Buttons */}
           <div className="flex space-x-4">
             <button
               type="button"

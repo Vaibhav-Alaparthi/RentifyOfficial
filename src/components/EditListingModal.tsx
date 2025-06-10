@@ -1,8 +1,10 @@
+// EditListingModal component allows users to edit an existing listing in a modal dialog.
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { LocalStorageAuth } from '../lib/localStorage';
 import ImageUpload from './ImageUpload';
 
+// Listing interface defines the structure of a rental listing.
 interface Listing {
   id: string;
   title: string;
@@ -20,6 +22,7 @@ interface Listing {
   created_at: string;
 }
 
+// Props for EditListingModal: listing to edit, modal state, close handler, and update callback.
 interface EditListingModalProps {
   listing: Listing;
   isOpen: boolean;
@@ -27,13 +30,15 @@ interface EditListingModalProps {
   onListingUpdated: (updatedListing: Listing) => void;
 }
 
+// Main EditListingModal component
 const EditListingModal: React.FC<EditListingModalProps> = ({ 
   listing, 
   isOpen, 
   onClose, 
   onListingUpdated 
 }) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state for form submission
+  // Form state initialized with listing data
   const [formData, setFormData] = useState({
     title: listing.title,
     description: listing.description,
@@ -47,6 +52,7 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
     images: [...listing.images]
   });
 
+  // Handles changes to text, textarea, and select inputs
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -55,6 +61,7 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
     }));
   };
 
+  // Handles changes to the images array
   const handleImagesChange = (images: string[]) => {
     setFormData(prev => ({
       ...prev,
@@ -62,13 +69,16 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
     }));
   };
 
+  // Handles form submission to update the listing
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // Compose location string from city, state, and country
       const location = `${formData.city}, ${formData.state}, ${formData.country}`;
       
+      // Update listing in local storage
       const updatedListing = LocalStorageAuth.updateListing(listing.id, {
         title: formData.title,
         description: formData.description,
@@ -84,8 +94,8 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
       });
 
       if (updatedListing) {
-        onListingUpdated(updatedListing);
-        onClose();
+        onListingUpdated(updatedListing); // Notify parent of update
+        onClose(); // Close modal
       } else {
         throw new Error('Failed to update listing');
       }
@@ -97,11 +107,13 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
     }
   };
 
+  // If modal is not open, render nothing
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Modal Header */}
         <div className="sticky top-0 bg-white border-b px-6 py-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold">Edit Listing</h2>
@@ -114,7 +126,9 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
           </div>
         </div>
 
+        {/* Edit Listing Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Title Input */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
               Item Title *
@@ -130,6 +144,7 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
             />
           </div>
 
+          {/* Description Input */}
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
               Description *
@@ -145,6 +160,7 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
             />
           </div>
 
+          {/* Price and Price Unit Inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
@@ -186,6 +202,7 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
             <h3 className="text-lg font-medium text-blue-900 mb-3">Location Information</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* City Input */}
               <div>
                 <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
                   City *
@@ -202,6 +219,7 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
                 />
               </div>
 
+              {/* State Input */}
               <div>
                 <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
                   State/Province *
@@ -218,6 +236,7 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
                 />
               </div>
 
+              {/* Country Input */}
               <div>
                 <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
                   Country *
@@ -241,6 +260,7 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
             </div>
           </div>
 
+          {/* Category and Condition Inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
@@ -281,6 +301,7 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
             </div>
           </div>
 
+          {/* Images Upload Section */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Images
@@ -292,6 +313,7 @@ const EditListingModal: React.FC<EditListingModalProps> = ({
             />
           </div>
 
+          {/* Action Buttons */}
           <div className="flex space-x-4 pt-4">
             <button
               type="button"

@@ -1,3 +1,4 @@
+// RentalsPage displays all rentals for the current user, separated into 'renting' and 'lending' tabs.
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, DollarSign, User, Package, MessageCircle, ImageOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -5,6 +6,7 @@ import { LocalStorageAuth } from '../lib/localStorage';
 import { useAuth } from '../contexts/AuthContext';
 import ChatModal from '../components/ChatModal';
 
+// Rental interface represents a rental transaction.
 interface Rental {
   id: string;
   listing_id: string;
@@ -18,29 +20,38 @@ interface Rental {
   updated_at: string;
 }
 
+// Listing interface represents a minimal listing for rental context.
 interface Listing {
   id: string;
   title: string;
   images: string[];
 }
 
+// RentalWithListing extends Rental with listing details.
 interface RentalWithListing extends Rental {
   listing: Listing | null;
 }
 
+// Main RentalsPage component
 const RentalsPage: React.FC = () => {
   const { user } = useAuth();
+  // State for all rentals with listing details
   const [rentals, setRentals] = useState<RentalWithListing[]>([]);
+  // Loading state for data fetch
   const [loading, setLoading] = useState(true);
+  // Tab state: 'renting' (as renter) or 'lending' (as owner)
   const [activeTab, setActiveTab] = useState<'renting' | 'lending'>('renting');
+  // State for the currently selected listing for chat
   const [selectedChatListing, setSelectedChatListing] = useState<any>(null);
 
+  // Fetch rentals when user changes
   useEffect(() => {
     if (user) {
       fetchRentals();
     }
   }, [user]);
 
+  // Loads all rentals for the user, including listing details
   const fetchRentals = () => {
     if (!user) return;
 
@@ -59,6 +70,7 @@ const RentalsPage: React.FC = () => {
     }
   };
 
+  // Handles updating rental status (approve, reject, complete)
   const handleStatusUpdate = (rentalId: string, newStatus: Rental['status']) => {
     try {
       LocalStorageAuth.updateRentalStatus(rentalId, newStatus);
@@ -68,6 +80,7 @@ const RentalsPage: React.FC = () => {
     }
   };
 
+  // Handles opening the chat modal for a rental
   const handleChatClick = (rental: RentalWithListing) => {
     if (!rental.listing) return;
     
@@ -81,6 +94,7 @@ const RentalsPage: React.FC = () => {
     });
   };
 
+  // Returns a color class for the rental status badge
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800';
@@ -91,16 +105,19 @@ const RentalsPage: React.FC = () => {
     }
   };
 
+  // Gets the email of the other user in the rental
   const getOtherUserEmail = (rental: RentalWithListing) => {
     const otherUserId = activeTab === 'renting' ? rental.owner_id : rental.renter_id;
     const otherUser = LocalStorageAuth.getUserById(otherUserId);
     return otherUser?.email || 'Unknown User';
   };
 
+  // Formats a date string for display
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  // If user is not signed in, prompt to sign in
   if (!user) {
     return (
       <div className="pt-20 pb-8">
@@ -115,6 +132,7 @@ const RentalsPage: React.FC = () => {
     );
   }
 
+  // Show loading spinner while fetching
   if (loading) {
     return (
       <div className="pt-20 flex justify-center items-center min-h-screen">
@@ -123,6 +141,7 @@ const RentalsPage: React.FC = () => {
     );
   }
 
+  // Separate rentals into those the user is renting and lending
   const rentingRentals = rentals.filter(rental => rental.renter_id === user.id);
   const lendingRentals = rentals.filter(rental => rental.owner_id === user.id);
 
@@ -131,7 +150,7 @@ const RentalsPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4">
         <h1 className="text-3xl font-bold mb-8">My Rentals</h1>
 
-        {/* Tabs */}
+        {/* Tabs for switching between renting and lending */}
         <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 mb-6">
           <button
             onClick={() => setActiveTab('renting')}
@@ -157,7 +176,7 @@ const RentalsPage: React.FC = () => {
           </button>
         </div>
 
-        {/* Rental List */}
+        {/* Rental List for active tab */}
         <div className="space-y-4">
           {(activeTab === 'renting' ? rentingRentals : lendingRentals).length === 0 ? (
             <div className="text-center py-12">
@@ -175,13 +194,14 @@ const RentalsPage: React.FC = () => {
               </Link>
             </div>
           ) : (
+            // Render a card for each rental in the active tab
             (activeTab === 'renting' ? rentingRentals : lendingRentals).map(rental => {
               const hasImage = rental.listing?.images && rental.listing.images.length > 0 && rental.listing.images[0];
               
               return (
                 <div key={rental.id} className="bg-white rounded-lg shadow-md p-6">
                   <div className="flex flex-col md:flex-row gap-4">
-                    {/* Item Image */}
+                    {/* Item Image or Placeholder */}
                     <div className="w-full md:w-32 h-32 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
                       {hasImage ? (
                         <img
@@ -237,7 +257,7 @@ const RentalsPage: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Action Buttons */}
+                      {/* Action Buttons for chat and status updates */}
                       <div className="flex flex-wrap gap-2">
                         {/* Chat Button - Always Available */}
                         <button
@@ -248,7 +268,7 @@ const RentalsPage: React.FC = () => {
                           <span>Chat with {activeTab === 'renting' ? 'Owner' : 'Renter'}</span>
                         </button>
 
-                        {/* Owner Action Buttons */}
+                        {/* Owner Action Buttons for pending rentals */}
                         {activeTab === 'lending' && rental.status === 'pending' && (
                           <>
                             <button
@@ -284,7 +304,7 @@ const RentalsPage: React.FC = () => {
           )}
         </div>
 
-        {/* Chat Modal */}
+        {/* Chat Modal for selected rental */}
         {selectedChatListing && (
           <ChatModal
             listing={selectedChatListing}
