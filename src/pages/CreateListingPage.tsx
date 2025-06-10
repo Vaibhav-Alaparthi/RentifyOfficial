@@ -152,7 +152,6 @@ const CreateListingPage: React.FC = () => {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h3 className="text-lg font-medium text-blue-900 mb-3">Location Information</h3>
             <p className="text-sm text-blue-700 mb-4">
-              Help renters find items near them. We only show city and state to protect your privacy.
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
