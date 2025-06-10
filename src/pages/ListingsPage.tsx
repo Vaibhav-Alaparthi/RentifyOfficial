@@ -1,6 +1,6 @@
 /*
   Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
-  6/9/25
+  6/5/25
 
   This file displays all available rental listings in the renting marketplace website with search and filter functionality to browse items.
 */
