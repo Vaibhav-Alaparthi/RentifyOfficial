@@ -1,6 +1,6 @@
 /*
   Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
-  6/9/25
+  6/4/25
 
   This file provides a component for users to upload, preview, and remove images for a rental listing in the renting marketplace website.
 */
