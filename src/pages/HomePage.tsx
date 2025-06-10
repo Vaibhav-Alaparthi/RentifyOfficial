@@ -1,6 +1,6 @@
 /*
   Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
-  6/9/25
+  6/3/25
 
   This file defines the main landing page for the Rentify app in the renting marketplace website, featuring a hero section and a features section to introduce users to the platform.
 */
