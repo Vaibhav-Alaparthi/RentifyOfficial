@@ -1,6 +1,6 @@
 /*
   Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
-  6/9/25
+  6/5/25
 
   This file provides the main navigation bar for the renting marketplace website, including links and user actions.
 */
