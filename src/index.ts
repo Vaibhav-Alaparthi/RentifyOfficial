@@ -1,6 +1,6 @@
 /*
   Ayush Vupalanchi, Vaibhav Alaparthi, Hiruna Devadithya
-  6/9/25
+  6/6/25
 
   This file defines TypeScript interfaces for User, Listing, Message, Rental, and Conversation types used across the renting marketplace website.
 */
